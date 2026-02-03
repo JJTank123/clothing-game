@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Clothing Budget Drag & Drop</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body {
+    font-family: Arial;
+    background-color: #f4f6f8;
+    text-align: center;
+    padding: 20px;
+  }
+  #doll-container {
+    position: relative;
+    display: inline-block;
+    margin: 20px;
+  }
+  #doll {
+    width: 200px;
+  }
+  .clothes {
+    width: 80px;
+    margin: 10px;
+    cursor: grab;
+  }
+  #clothes-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+  #drawer {
+    display: none;
+    background: #fff3cd;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 20px;
+    font-size: 20px;
+    font-weight: bold;
+  }
+  #budget-box {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    max-width: 300px;
+    margin: auto;
+  }
+</style>
+</head>
+<body>
+
+<h2>👕 Clothing Budget Drag & Drop</h2>
+<p>Drag clothes onto the doll. Stay under budget to unlock the code!</p>
+
+<div id="budget-box">
+  <p><strong>Budget:</strong> $75</p>
+  <p><strong>Total Spent:</strong> $<span id="total">0</span></p>
+</div>
+
+<div id="doll-container">
+  <img id="doll" src="doll.png" alt="Doll">
+</div>
+
+<div id="clothes-container">
+  <img src="tshirt.png" class="clothes" draggable="true" data-price="20">
+  <img src="jeans.png" class="clothes" draggable="true" data-price="30">
+  <img src="sneakers.png" class="clothes" draggable="true" data-price="25">
+  <img src="hat.png" class="clothes" draggable="true" data-price="15">
+</div>
+
+<button onclick="checkBudget()">Finish Outfit</button>
+<button onclick="resetGame()">Reset Outfit</button>
+
+<div id="drawer">
+  🔓 Drawer Unlocked!  
+  <br><br>
+  ✅ **Secret Code: 4829**
+</div>
+
+<script>
+let budget = 75;
+let total = 0;
+
+// Track clothes on doll
+let placedClothes = [];
+
+// Drag and Drop
+const clothesImages = document.querySelectorAll('.clothes');
+const dollContainer = document.getElementById('doll-container');
+
+clothesImages.forEach(img => {
+  img.addEventListener('dragstart', dragStart);
+});
+
+dollContainer.addEventListener('dragover', dragOver);
+dollContainer.addEventListener('drop', drop);
+
+function dragStart(e) {
+  e.dataTransfer.setData("text", e.target.src);
+  e.dataTransfer.setData("price", e.target.dataset.price);
+}
+
+function dragOver(e) {
+  e.preventDefault();
+}
+
+function drop(e) {
+  e.preventDefault();
+  const src = e.dataTransfer.getData("text");
+  const price = parseInt(e.dataTransfer.getData("price"));
+
+  // Create new image on doll
+  const newCloth = document.createElement("img");
+  newCloth.src = src;
+  newCloth.style.position = "absolute";
+  newCloth.style.top = "0px";
+  newCloth.style.left = "0px";
+  newCloth.style.width = "80px";
+
+  dollContainer.appendChild(newCloth);
+
+  // Add to total
+  total += price;
+  document.getElementById("total").innerText = total;
+
+  // Track placed clothes
+  placedClothes.push(newCloth);
+}
+
+// Reset
+function resetGame() {
+  total = 0;
+  document.getElementById("total").innerText = total;
+  document.getElementById("drawer").style.display = "none";
+
+  // Remove clothes from doll
+  placedClothes.forEach(c => c.remove());
+  placedClothes = [];
+}
+
+// Check budget
+function checkBudget() {
+  if (total <= budget) {
+    document.getElementById("drawer").style.display = "block";
+  } else {
+    alert("🚫 Over budget! Remove some clothes.");
+  }
+}
+</script>
+
+</body>
+</html>
